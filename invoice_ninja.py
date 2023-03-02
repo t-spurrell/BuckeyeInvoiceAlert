@@ -8,12 +8,12 @@ class InvoiceNinja:
         self.token = token
 
     def get_client_name(self, client_id):
-        url = f'{self.host}/clients'
+        url = f'{self.host}/clients/{client_id}'
         headers = {'X-API-Token': self.token, 'Content-Type': 'application/json'}
         response = get(url=url, headers=headers)
         if response.ok:
             data = response.json()
-            client_name = data['data'][0]['name']
+            client_name = data['data']['name']
             return client_name
 
     def get_overdue_invoices(self):
