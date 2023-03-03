@@ -1,8 +1,7 @@
-import smtplib
 import notes
 import os
 import pandas as pd
-from email.message import EmailMessage
+from teams import TeamsConfig
 from configuration import load_config, file_exist
 from invoice_ninja import InvoiceNinja
 
@@ -12,23 +11,14 @@ CONFIG = load_config()
 invoice_ninja_conn = InvoiceNinja(host=CONFIG['invoice_ninja']['base_url'], token=CONFIG['invoice_ninja']['token'])
 
 
-def send_email(body=None):
-    pw = CONFIG['email']['pw']
-    msg = EmailMessage()
-    msg['Subject'] = f'test'
-    msg['From'] = CONFIG['email']['address']
-    msg['To'] = CONFIG['email']['to']
-    msg.set_content(f'test')
-
-    with smtplib.SMTP('smtp.office365.com', 587) as smtp:
-        smtp.ehlo()
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(CONFIG['email']['address'], pw)
-        smtp.send_message(msg)
+def send_to_teams(body):
+    message = TeamsConfig(CONFIG['url'])
+    message.color("ff4000")
+    message.text(body)
+    message.send()
 
 
-def previously_notified(invoice_id):
+def previously_notified(invoice_id) -> bool:
     if file_exist('notified'):
         with open('notified', 'r') as f:
             data = f.read()
@@ -38,7 +28,7 @@ def previously_notified(invoice_id):
                 return False
 
 
-def first_of_month():
+def first_of_month() -> None:
     day = pd.Timestamp.today()
     if day.is_month_start:
         if file_exist('notified'):
@@ -68,7 +58,7 @@ def main():
                 overdue.append(client)
         if overdue:
             body = notes.overdue(overdue)
-            #send_email(body)
+            send_to_teams(body)
             print(body)
         else:
             print('no overdue clients')
@@ -76,7 +66,7 @@ def main():
 
 if __name__ == '__main__':
     main()
-    #send_email()
+
 
 
 
