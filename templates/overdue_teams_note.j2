@@ -1,0 +1,9 @@
+The following client(s) have invoices that are OVERDUE:
+
+{%for client in clients_overdue%}
+
+Client: {{client["name"]}}
+Invoice ID: {{client["invoice_id"]}}
+Balance: ${{client["balance"]}}
+
+{%endfor%}
