@@ -11,7 +11,7 @@ CONFIG = load_config()
 invoice_ninja_conn = InvoiceNinja(host=CONFIG['invoice_ninja']['base_url'], token=CONFIG['invoice_ninja']['token'])
 
 
-def send_to_teams(body):
+def send_to_teams(body) -> None:
     message = TeamsConfig(CONFIG['url'])
     message.color("ff4000")
     message.text(body)
@@ -48,24 +48,28 @@ def main():
                 client_id = o['client_id']
                 client_name = invoice_ninja_conn.get_client_name(client_id)
                 balance = o['balance']
+                due_date = o['due_date']
+                days_late = pd.Timestamp.today() - pd.Timestamp(due_date)
                 with open('notified', 'a') as f:
                     f.write(str(invoice_id) + '\n')
                 client = {
                     'name': client_name,
                     'invoice_id': invoice_id,
-                    'balance': balance
+                    'balance': balance,
+                    'days_late': days_late.days
                 }
                 overdue.append(client)
         if overdue:
             body = notes.overdue(overdue)
             send_to_teams(body)
-            print(body)
+            #print(body)
         else:
             print('no overdue clients')
 
 
 if __name__ == '__main__':
     main()
+
 
 
 
