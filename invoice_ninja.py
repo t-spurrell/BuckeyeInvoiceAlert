@@ -17,7 +17,7 @@ class InvoiceNinja:
             return client_name
 
     def get_overdue_invoices(self):
-        url = f'{self.host}/invoices?client_status=overdue&status=active'
+        url = f'{self.host}/invoices?status=active&filter_deleted_clients=true&overdue=true'
         headers = {'X-API-Token': self.token, 'Content-Type': 'application/json'}
         response = get(url=url, headers=headers)
         if response.ok:
